@@ -1,0 +1,32 @@
+:root {
+    --background: #272727;
+    --text: #747474;
+    --link: #6495ed;
+    --active-link: #ed7464;
+}
+
+* {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color : var(--text);
+    user-select: none;
+}
+
+body {
+    background-color: var(--background);
+}
+
+#header-parent {
+    text-align: center;
+}
+
+a {
+    color: var(--link);
+    transform: scale(1);
+    text-decoration: none !important;
+    transition: all 0.5s ease-in-out;
+}
+
+a:hover {
+    color: var(--active-link);
+    transform: scale(1.1);
+}
