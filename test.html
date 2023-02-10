@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тест на личность</title>
+    <style>
+        * {
+            font-family: "Segoe Fluent Icons", sans-serif;
+            user-select: none;
+            background-color: #424242;
+            color: #FDFDFD;
+            border-color: #FDFDFD;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        article {
+            margin: 50px;
+            padding: 10px;
+            border: antiquewhite solid 2px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Basic Example with JSX</h1>
+
+<div id="container"></div>
+
+<script src="https://unpkg.com/react@15/dist/react.min.js"></script>
+<script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser.min.js"></script>
+<script type="text/babel">
+    function App() {
+        let [finished, setFinished] = React.useState(false)
+        return (
+            <main className="App">
+                <h1>Тест на личность</h1>
+
+                <article>
+                    <h2>Любите ли вы родину?</h2>
+                    <button onClick={function (){
+                        window.location.replace("https://contract.mil.ru/enlistment_contract/info.htm")
+                    }
+                    }>Да</button>
+
+                    <button onClick={function (){
+                        alert("НЕПРАВИЛЬНО, прослушай гимн России и попробуй ещё раз");
+                    }
+                    }>Нет</button>
+
+                </article>
+            </main>
+        );
+    }
+    setInterval(function() {
+        ReactDOM.render(
+            <App />,
+            document.getElementById('container')
+        );
+    }, 5000);
+</script>
+
+</body>
+</html>
