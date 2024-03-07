@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Векторы</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.1/jsxgraphcore.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <style>
+    #jxgbox-addition, #jxgbox-rotation, #jxgbox-length, #jxgbox-triangle-addition {
+      width: 100%;
+      height: 300px;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider-container {
+      margin-top: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Векторы</h1>
+  <p>Вектор - это математический объект, характеризующийся величиной (длиной) и направлением.</p>
+  <p>На этой странице вы можете визуализировать и выполнять различные операции с векторами, такие как сложение, вращение и определение длины.</p>
+  
+  <div class="card">
+    <h2>Сложение векторов методом параллелограмма</h2>
+    <p>Сложение векторов происходит по правилу параллелограмма.</p>
+    <div id="jxgbox-addition"></div>
+    <div class="slider-container">
+      <label for="angle-addition">Угол поворота: <span id="angle-addition-value">0°</span></label>
+      <input autocomplete="off" type="range" id="angle-addition" min="0" max="360" step="1" value="0">
+    </div>
+    <div class="slider-container">
+      <label for="scale">Масштаб: <span id="scale-value">1</span></label>
+      <input autocomplete="off" type="range" id="scale" min="0" max="3" step="0.1" value="1">
+    </div>
+    <div class="checkbox-container">
+      <input type="checkbox" id="show-puncture-lines" onchange="updateAdditionGraph()">
+      <label for="show-puncture-lines">Показать прямые</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Сложение векторов методом треугольника</h2>
+    <p>Сложение векторов происходит по правилу треугольника.</p>
+    <div id="jxgbox-triangle-addition"></div>
+    <div class="slider-container">
+      <label for="length1">Длина 1-го вектора: <span id="length1-value">1</span></label>
+      <input autocomplete="off" type="range" id="length1" min="0.1" max="10" step="0.1" value="1">
+      <label for="angle1">Угол поворота 1-го вектора: <span id="angle1-value">0°</span></label>
+      <input autocomplete="off" type="range" id="angle1" min="0" max="360" step="1" value="0">
+    </div>
+    <div class="slider-container">
+      <label for="length2">Длина 2-го вектора: <span id="length2-value">1</span></label>
+      <input autocomplete="off" type="range" id="length2" min="0.1" max="10" step="0.1" value="1">
+      <label for="angle2">Угол поворота 2-го вектора: <span id="angle2-value">0°</span></label>
+      <input autocomplete="off" type="range" id="angle2" min="0" max="360" step="1" value="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Вращение вектора</h2>
+    <p>Вращение вектора вокруг начала координат.</p>
+    <div id="jxgbox-rotation"></div>
+    <div class="slider-container">
+      <label for="angle-rotation">Угол вращения: <span id="angle-rotation-value">0°</span></label>
+      <input autocomplete="off" type="range" id="angle-rotation" min="0" max="360" step="1" value="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Определение длины вектора и его вращение</h2>
+    <p>Длина вектора — это величина, равная расстоянию между началом и концом вектора.</p>
+    <div id="jxgbox-length"></div>
+    <div class="slider-container">
+      <label for="length">Длина вектора: <span id="length-value">1</span></label>
+      <input autocomplete="off" type="range" id="length" min="1" max="10" step="0.1" value="1">
+      <label for="angle-length">Угол вращения: <span id="angle-length-value">0°</span></label>
+      <input autocomplete="off" type="range" id="angle-length" min="0" max="360" step="1" value="0">
+    </div>
+  </div>
+
+  <script>
+  window.addEventListener('load', function() {
+    updateAdditionGraph();
+    updateTriangleAdditionGraph();
+    updateRotationGraph();
+    updateLengthGraph();
+    MathJax.typeset();
+  });
+
+  // Vector Addition Graph
+  const boardAddition = JXG.JSXGraph.initBoard('jxgbox-addition', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const angleAdditionSlider = document.getElementById('angle-addition');
+  const angleAdditionValue = document.getElementById('angle-addition-value');
+  const scaleSlider = document.getElementById('scale');
+  const scaleValue = document.getElementById('scale-value');
+  const showPunctureLinesCheckbox = document.getElementById('show-puncture-lines');
+  angleAdditionSlider.addEventListener('input', updateAdditionGraph);
+  scaleSlider.addEventListener('input', updateAdditionGraph);
+  showPunctureLinesCheckbox.addEventListener('change', updateAdditionGraph);
+  let v1Addition = null;
+  let v2Addition = null;
+  let sumVector = null;
+  let punctureLine1 = null;
+  let punctureLine2 = null;
+  function updateAdditionGraph() {
+    if (v1Addition) {
+      boardAddition.removeObject(v1Addition);
+    }
+    if (v2Addition) {
+      boardAddition.removeObject(v2Addition);
+    }
+    if (sumVector) {
+      boardAddition.removeObject(sumVector);
+    }
+    if (punctureLine1) {
+      boardAddition.removeObject(punctureLine1);
+    }
+    if (punctureLine2) {
+      boardAddition.removeObject(punctureLine2);
+    }
+    const angle = parseFloat(angleAdditionSlider.value);
+    angleAdditionValue.textContent = angle.toFixed(0) + '°';
+    const scale = parseFloat(scaleSlider.value);
+    scaleValue.textContent = scale.toFixed(1);
+    const v1x = Math.cos((angle + 30) * Math.PI / 180) * scale;
+    const v1y = Math.sin((angle + 30) * Math.PI / 180) * scale;
+    const v2x = Math.cos((30) * Math.PI / 180) * scale;
+    const v2y = Math.sin((30) * Math.PI / 180) * scale;
+    v1Addition = boardAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'blue'});
+    v2Addition = boardAddition.create('arrow', [[0, 0], [v2x, v2y]], {strokeColor: 'red'});
+    sumVector = boardAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green'});
+    if (showPunctureLinesCheckbox.checked) {
+      punctureLine1 = boardAddition.create('line', [[v1x, v1y], [v1x + v2x, v1y + v2y]], {strokeColor: 'gray', dash: 2});
+      punctureLine2 = boardAddition.create('line', [[v2x, v2y], [v1x + v2x, v1y + v2y]], {strokeColor: 'gray', dash: 2});
+    }
+    boardAddition.update();
+  }
+
+  // Vector Triangle Addition Graph
+  const boardTriangleAddition = JXG.JSXGraph.initBoard('jxgbox-triangle-addition', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+
+  const length1Slider = document.getElementById('length1');
+  const angle1Slider = document.getElementById('angle1');
+  const length2Slider = document.getElementById('length2');
+  const angle2Slider = document.getElementById('angle2');
+  const length1Value = document.getElementById('length1-value');
+  const angle1Value = document.getElementById('angle1-value');
+  const length2Value = document.getElementById('length2-value');
+  const angle2Value = document.getElementById('angle2-value');
+
+  length1Slider.addEventListener('input', updateTriangleAdditionGraph);
+  angle1Slider.addEventListener('input', updateTriangleAdditionGraph);
+  length2Slider.addEventListener('input', updateTriangleAdditionGraph);
+  angle2Slider.addEventListener('input', updateTriangleAdditionGraph);
+
+  let v1Triangle = null;
+  let v2Triangle = null;
+  let sumVectorTriangle = null;
+
+  function updateTriangleAdditionGraph() {
+    if (v1Triangle) {
+      boardTriangleAddition.removeObject(v1Triangle);
+    }
+    if (v2Triangle) {
+      boardTriangleAddition.removeObject(v2Triangle);
+    }
+    if (sumVectorTriangle) {
+      boardTriangleAddition.removeObject(sumVectorTriangle);
+    }
+
+    const length1 = parseFloat(length1Slider.value);
+    const angle1 = parseFloat(angle1Slider.value);
+    const length2 = parseFloat(length2Slider.value);
+    const angle2 = parseFloat(angle2Slider.value);
+
+    length1Value.textContent = length1.toFixed(1);
+    angle1Value.textContent = angle1.toFixed(0) + '°';
+    length2Value.textContent = length2.toFixed(1);
+    angle2Value.textContent = angle2.toFixed(0) + '°';
+
+    const v1x = Math.cos((angle1) * Math.PI / 180) * length1;
+    const v1y = Math.sin((angle1) * Math.PI / 180) * length1;
+    const v2x = Math.cos((angle2) * Math.PI / 180) * length2;
+    const v2y = Math.sin((angle2) * Math.PI / 180) * length2;
+
+    v1Triangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'red'});
+    v2Triangle = boardTriangleAddition.create('arrow', [[v1x, v1y], [v1x + v2x, v1y + v2y]], {strokeColor: 'blue'});
+    sumVectorTriangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green'});
+
+    boardTriangleAddition.update();
+  }
+
+  // Vector Rotation Graph
+  const boardRotation = JXG.JSXGraph.initBoard('jxgbox-rotation', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const angleRotationSlider = document.getElementById('angle-rotation');
+  const angleRotationValue = document.getElementById('angle-rotation-value');
+  angleRotationSlider.addEventListener('input', updateRotationGraph);
+  let vRotation = null;
+  function updateRotationGraph() {
+    if (vRotation) {
+      boardRotation.removeObject(vRotation);
+    }
+    const angle = parseFloat(angleRotationSlider.value);
+    angleRotationValue.textContent = angle.toFixed(0) + '°';
+    const vx = Math.cos((angle) * Math.PI / 180);
+    const vy = Math.sin((angle) * Math.PI / 180);
+    vRotation = boardRotation.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'blue'});
+    boardRotation.update();
+  }
+
+  // Vector Length Graph
+  const boardLength = JXG.JSXGraph.initBoard('jxgbox-length', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+
+  const lengthSlider = document.getElementById('length');
+  const lengthValue = document.getElementById('length-value');
+  const angleLengthSlider = document.getElementById('angle-length');
+  const angleLengthValue = document.getElementById('angle-length-value');
+
+  lengthSlider.addEventListener('input', updateLengthGraph);
+  angleLengthSlider.addEventListener('input', updateLengthGraph);
+
+  let vLength = null;
+  let segX = null;
+  let segY = null;
+  let formulaText = null;
+
+  function updateLengthGraph() {
+    if (vLength) {
+      boardLength.removeObject(vLength);
+    }
+    if (segX) {
+      boardLength.removeObject(segX);
+    }
+    if (segY) {
+      boardLength.removeObject(segY);
+    }
+    if (formulaText) {
+      boardLength.removeObject(formulaText);
+    }
+
+    const length = parseFloat(lengthSlider.value);
+    const angle = parseFloat(angleLengthSlider.value);
+    const vx = Math.cos((angle) * Math.PI / 180) * length;
+    const vy = Math.sin((angle) * Math.PI / 180) * length;
+
+    lengthValue.textContent = length.toFixed(1);
+    angleLengthValue.textContent = angle.toFixed(0) + '°';
+
+    segX = boardLength.create('segment', [[0, 0], [vx, 0]], {strokeColor: 'red'});
+    segY = boardLength.create('segment', [[vx, 0], [vx, vy]], {strokeColor: 'blue'});
+
+    const lengthX = Math.abs(vx);
+    const lengthY = Math.abs(vy);
+
+    const vectorLength = Math.sqrt(lengthX * lengthX + lengthY * lengthY);
+
+    vLength = boardLength.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'green'});
+
+    const formula = `\\(\\sqrt{(${lengthX.toFixed(1)})&sup2; + (${lengthY.toFixed(1)})&sup2;} = ${vectorLength.toFixed(1)}\\)`;
+
+    formulaText = boardLength.create('text', [-8, 3.5, ''], {fontSize: 18, strokeColor: 'black'});
+
+    formulaText.rendNode.innerHTML = formula;
+
+    MathJax.typeset();
+  }
+</script>
+</body>
+</html>
