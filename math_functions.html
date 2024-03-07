@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Математические функции</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.1/jsxgraphcore.js"></script>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <style>
+    #jxgbox-linear, #jxgbox-hyperbola, #jxgbox-parabola, #jxgbox-sine {
+      width: 100%;
+      height: 300px; /* Set the initial height */
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .slider-container {
+      margin-top: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Математические функции</h1>
+  <p>Функцией называется соответствие между двумя множествами, при котором каждому элементу одного множества соответствует единственный элемент другого множества</p>
+  <p>График функции — геометрическое понятие в математике, дающее представление о геометрическом образе функции.</p>
+  
+  <div class="card">
+    <h2>Линейная функция: \(y = ax + b\)</h2>
+    <p>Линейная функция представляет собой прямую линию на графике.</p>
+    <div id="jxgbox-linear"></div>
+    <div class="slider-container">
+      <label for="a-linear">Значение 'a': <span id="a-linear-value">a = 1</span></label>
+      <input autocomplete="off" type="range" id="a-linear" min="-5" max="5" step="0.1" value="1">
+      <label for="b-linear">Значение 'b': <span id="b-linear-value">b = 0</span></label>
+      <input autocomplete="off" type="range" id="b-linear" min="-10" max="10" step="0.1" value="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Обратная пропорциональность: \(y = \frac{a}{x}\)</h2>
+    <p>Функция обратной пропорциональности при изображении на графике образует гиперболу.</p>
+    <div id="jxgbox-hyperbola"></div>
+    <div class="slider-container">
+      <label for="a-hyperbola">Значение 'a': <span id="a-hyperbola-value">a = 1</span></label>
+      <input autocomplete="off" type="range" id="a-hyperbola" min="-5" max="5" step="0.1" value="1">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Квадратичная функция: \(y = ax^2 + bx + c\)</h2>
+    <p>Если построить график квадратичной функции, получится гипербола.</p>
+    <div id="jxgbox-parabola"></div>
+    <div class="slider-container">
+      <label for="a-parabola">Значение 'a': <span id="a-parabola-value">a = 1</span></label>
+      <input autocomplete="off" type="range" id="a-parabola" min="-5" max="5" step="0.1" value="1">
+      <label for="b-parabola">Значение 'b': <span id="b-parabola-value">b = 0</span></label>
+      <input autocomplete="off" type="range" id="b-parabola" min="-5" max="5" step="0.1" value="0">
+      <label for="c-parabola">Значение 'c': <span id="c-parabola-value">c = 0</span></label>
+      <input autocomplete="off" type="range" id="c-parabola" min="-5" max="5" step="0.1" value="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Функция синуса: \(y = \sin(x + a) \times b\)</h2>
+    <p>Если попробовать изобразить график функции синуса, то получится синусоида.</p>
+    <div id="jxgbox-sine"></div>
+    <div class="slider-container">
+      <label for="a-sine">Значение 'a': <span id="a-sine-value">a = 0</span></label>
+      <input autocomplete="off" type="range" id="a-sine" min="-5" max="5" step="0.1" value="0">
+      <label for="b-sine">Значение 'b': <span id="b-sine-value">b = 1</span></label>
+      <input autocomplete="off" type="range" id="b-sine" min="-5" max="5" step="0.1" value="1">
+    </div>
+  </div>
+
+  <script>
+  window.addEventListener('load', function() {
+    updateLinearGraph();
+    updateHyperbolaGraph();
+    updateParabolaGraph();
+    updateSineGraph();
+  });
+
+  // Linear Function Graph
+  const boardLinear = JXG.JSXGraph.initBoard('jxgbox-linear', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const aLinearSlider = document.getElementById('a-linear');
+  const bLinearSlider = document.getElementById('b-linear');
+  const aLinearValue = document.getElementById('a-linear-value');
+  const bLinearValue = document.getElementById('b-linear-value');
+  aLinearSlider.addEventListener('input', updateLinearGraph);
+  bLinearSlider.addEventListener('input', updateLinearGraph);
+  let fLinear = null;
+  function updateLinearGraph() {
+    if (fLinear) {
+      boardLinear.removeObject(fLinear);
+    }
+    const a = parseFloat(aLinearSlider.value);
+    const b = parseFloat(bLinearSlider.value);
+    aLinearValue.textContent = 'a = ' + a.toFixed(1);
+    bLinearValue.textContent = 'b = ' + b.toFixed(1);
+    fLinear = boardLinear.create('functiongraph', [(x) => a * x + b]);
+    boardLinear.update();
+  }
+
+  // Hyperbola Graph
+  const boardHyperbola = JXG.JSXGraph.initBoard('jxgbox-hyperbola', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const aHyperbolaSlider = document.getElementById('a-hyperbola');
+  const aHyperbolaValue = document.getElementById('a-hyperbola-value');
+  aHyperbolaSlider.addEventListener('input', updateHyperbolaGraph);
+  let fHyperbola = null;
+  function updateHyperbolaGraph() {
+    if (fHyperbola) {
+      boardHyperbola.removeObject(fHyperbola);
+    }
+    const a = parseFloat(aHyperbolaSlider.value);
+    aHyperbolaValue.textContent = 'a = ' + a.toFixed(1);
+    fHyperbola = boardHyperbola.create('functiongraph', [(x) => a / x]);
+    boardHyperbola.update();
+  }
+
+  // Parabola Graph
+  const boardParabola = JXG.JSXGraph.initBoard('jxgbox-parabola', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const aParabolaSlider = document.getElementById('a-parabola');
+  const bParabolaSlider = document.getElementById('b-parabola');
+  const cParabolaSlider = document.getElementById('c-parabola');
+  const aParabolaValue = document.getElementById('a-parabola-value');
+  const bParabolaValue = document.getElementById('b-parabola-value');
+  const cParabolaValue = document.getElementById('c-parabola-value');
+  aParabolaSlider.addEventListener('input', updateParabolaGraph);
+  bParabolaSlider.addEventListener('input', updateParabolaGraph);
+  cParabolaSlider.addEventListener('input', updateParabolaGraph);
+  let fParabola = null;
+  function updateParabolaGraph() {
+    if (fParabola) {
+      boardParabola.removeObject(fParabola);
+    }
+    const a = parseFloat(aParabolaSlider.value);
+    const b = parseFloat(bParabolaSlider.value);
+    const c = parseFloat(cParabolaSlider.value);
+    aParabolaValue.textContent = 'a = ' + a.toFixed(1);
+    bParabolaValue.textContent = 'b = ' + b.toFixed(1);
+    cParabolaValue.textContent = 'c = ' + c.toFixed(1);
+    fParabola = boardParabola.create('functiongraph', [(x) => a * x * x + b * x + c]);
+    boardParabola.update();
+  }
+
+  // Sine Function Graph
+  const boardSine = JXG.JSXGraph.initBoard('jxgbox-sine', {
+    boundingbox: [-10, 5, 10, -5],
+    axis: true,
+    keepaspectratio: true,
+    originY: "center",
+    originX: "center",
+    ticks: {
+      majorHeight: 1,
+      majorWidth: 1,
+      drawLabels: true
+    },
+    drag: true,
+    zoomX: 1.25,
+    zoomY: 1.25,
+    showCopyright: false,
+  });
+  const aSineSlider = document.getElementById('a-sine');
+  const bSineSlider = document.getElementById('b-sine');
+  const aSineValue = document.getElementById('a-sine-value');
+  const bSineValue = document.getElementById('b-sine-value');
+  aSineSlider.addEventListener('input', updateSineGraph);
+  bSineSlider.addEventListener('input', updateSineGraph);
+  let fSine = null;
+  function updateSineGraph() {
+    if (fSine) {
+      boardSine.removeObject(fSine);
+    }
+    const a = parseFloat(aSineSlider.value);
+    const b = parseFloat(bSineSlider.value);
+    aSineValue.textContent = 'a = ' + a.toFixed(1);
+    bSineValue.textContent = 'b = ' + b.toFixed(1);
+    fSine = boardSine.create('functiongraph', [(x) => Math.sin(x + a) * b]);
+    boardSine.update();
+  }
+</script>
+</body>
+</html>
