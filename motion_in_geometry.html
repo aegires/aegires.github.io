@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Движение(Геометрия)</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.1/jsxgraphcore.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <style>
+        #jxgbox-central-symmetry,
+        #jxgbox-axial-symmetry,
+        #jxgbox-parallel-transfer,
+        #jxgbox-rotation{
+            width: 100%;
+            height: 300px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>Движение(геометрия)</h1>
+<p>Движение - это отображение плоскости самой на себя с сохранением расстояний между её точками.</p>
+<p>На этой странице вы можете исследовать разные частные случаи движения.</p>
+
+<div class="card">
+    <h2>Центральная симметрия</h2>
+    <p>\( \triangle ABC \overset{O}{\longrightarrow} \triangle A_1B_1C_1 \)</p>
+    <div id="jxgbox-central-symmetry"></div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="show-puncture-lines-central" onchange="updateCentralSymmetryGraph()" autocomplete="off">
+        <label for="show-puncture-lines-central">Показать прямые</label>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Осевая симметрия</h2>
+    <p>\( \triangle ABC \overset{O_1O_2}{\longrightarrow} \triangle A_1B_1C_1 \)</p>
+    <div id="jxgbox-axial-symmetry"></div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="show-puncture-lines-axial" onchange="updateAxialSymmetryGraph()" autocomplete="off">
+        <label for="show-puncture-lines-axial">Показать прямые</label>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Паралельный перенос</h2>
+    <p>\( \triangle ABC \overset{\overrightarrow{p}}{\longrightarrow} \triangle A_1B_1C_1 \)</p>
+    <div id="jxgbox-parallel-transfer"></div>
+    <div class="slider-container">
+        <label for="x-offset">Сдвиг по X: <span id="x-offset-value">0</span></label>
+        <input autocomplete="off" type="range" id="x-offset" min="-5" max="5" step="0.1" value="0">
+    </div>
+    <div class="slider-container">
+        <label for="y-offset">Сдвиг по Y: <span id="y-offset-value">0</span></label>
+        <input autocomplete="off" type="range" id="y-offset" min="-5" max="5" step="0.1" value="0">
+    </div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="show-puncture-lines-transfer" onchange="updateAxialSymmetryGraph()" autocomplete="off">
+        <label for="show-puncture-lines-axial">Показать прямые</label>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Поворот</h2>
+    <p>\( \triangle ABC \overset{O; R°}{\longrightarrow} \triangle A_1B_1C_1 \)</p>
+    <div id="jxgbox-rotation"></div>
+    <div class="slider-container">
+        <label for="rotation">Угол поворота: <span id="rotation-value">0°</span></label>
+        <input autocomplete="off" type="range" id="rotation" min="0" max="360" step="0.5" value="0">
+    </div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="show-puncture-lines-rotate" onchange="updateAxialSymmetryGraph()" autocomplete="off">
+        <label for="show-puncture-lines-axial">Показать прямые</label>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load', function () {
+        updateCentralSymmetryGraph();
+        updateAxialSymmetryGraph();
+        updateTransferGraph();
+        updateRotationGraph();
+        MathJax.typeset();
+    });
+    const xOffsetSlider = document.getElementById('x-offset');
+    const yOffsetSlider = document.getElementById('y-offset');
+    const rotationSlider = document.getElementById('rotation');
+
+    const xOffsetValue = document.getElementById('x-offset-value');
+    const yOffsetValue = document.getElementById('y-offset-value');
+    const rotationValue = document.getElementById('rotation-value');
+
+    // Central Symmetry Graph
+    const boardCentralSymmetry = JXG.JSXGraph.initBoard('jxgbox-central-symmetry', {
+        boundingbox: [-10, 5, 10, -5],
+        axis: true,
+        keepaspectratio: true,
+        origin: [0, 0],
+        ticks: {
+            majorHeight: 1,
+            majorWidth: 1,
+            drawLabels: true
+        },
+        drag: true,
+        zoomX: 1.25,
+        zoomY: 1.25,
+        showCopyright: false,
+    });
+
+    let centralSymmetryA = boardCentralSymmetry.create('point', [0, 0], {name: 'A', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let centralSymmetryB = boardCentralSymmetry.create('point', [2, 3], {name: 'B', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let centralSymmetryC = boardCentralSymmetry.create('point', [-1, 2], {name: 'C', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let centralSymmetryABC = boardCentralSymmetry.create('polygon', [centralSymmetryA, centralSymmetryB, centralSymmetryC], {fillOpacity: 0, strokeOpacity: 1, strokeColor: 'red'});
+
+    let centralSymmetryO = boardCentralSymmetry.create('point', [2, 1], {name: 'O', fillColor: 'black', strokeColor: 'black'});
+
+    let centralSymmetryA1 = boardCentralSymmetry.create('point', [6, -4], {
+        name: 'A1',
+        fixed: true,
+        fillColor: 'blue',
+        fillOpacity: 1,
+        strokeColor: 'blue'
+    });
+    let centralSymmetryB1 = boardCentralSymmetry.create('point', [0, 3], {
+        name: 'B1',
+        fixed: true,
+        fillColor: 'blue',
+        fillOpacity: 1,
+        strokeColor: 'blue'
+    });
+    let centralSymmetryC1 = boardCentralSymmetry.create('point', [1, 4], {
+        name: 'C1',
+        fixed: true,
+        fillColor: 'blue',
+        fillOpacity: 1,
+        strokeColor: 'blue'
+    });
+    const centralSymmetryA1B1C1 = boardCentralSymmetry.create('polygon', [centralSymmetryA1, centralSymmetryB1, centralSymmetryC1], {
+        fillOpacity: 1,
+        fillColor: 'blue',
+        strokeColor: 'blue'
+    });
+
+    let showPunctureLinesCentralCheckbox = document.getElementById('show-puncture-lines-central');
+    showPunctureLinesCentralCheckbox.addEventListener('change', updateCentralSymmetryGraph);
+    let punctureLine1Central = boardCentralSymmetry.create('segment', [centralSymmetryA, centralSymmetryA1], {strokeColor: 'green', dash: 2});
+    let punctureLine2Central = boardCentralSymmetry.create('segment', [centralSymmetryB, centralSymmetryB1], {strokeColor: 'green', dash: 2});
+    let punctureLine3Central = boardCentralSymmetry.create('segment', [centralSymmetryC, centralSymmetryC1], {strokeColor: 'green', dash: 2});
+
+    boardCentralSymmetry.on('update', updateCentralSymmetryGraph);
+
+    function updateCentralSymmetryGraph() {
+        punctureLine1Central.point1.moveTo([centralSymmetryA.X(), centralSymmetryA.Y()]);
+        punctureLine2Central.point1.moveTo([centralSymmetryB.X(), centralSymmetryB.Y()]);
+        punctureLine3Central.point1.moveTo([centralSymmetryC.X(), centralSymmetryC.Y()]);
+        punctureLine1Central.point2.moveTo([centralSymmetryO.X(), centralSymmetryO.Y()]);
+        punctureLine2Central.point2.moveTo([centralSymmetryO.X(), centralSymmetryO.Y()]);
+        punctureLine3Central.point2.moveTo([centralSymmetryO.X(), centralSymmetryO.Y()]);
+
+        punctureLine1Central.setAttribute({visible: showPunctureLinesCentralCheckbox.checked});
+        punctureLine2Central.setAttribute({visible: showPunctureLinesCentralCheckbox.checked});
+        punctureLine3Central.setAttribute({visible: showPunctureLinesCentralCheckbox.checked});
+
+        centralSymmetryA1.setPosition(JXG.COORDS_BY_USER, [2 * centralSymmetryO.X() - centralSymmetryA.X(), 2 * centralSymmetryO.Y() - centralSymmetryA.Y()])
+        centralSymmetryB1.setPosition(JXG.COORDS_BY_USER, [2 * centralSymmetryO.X() - centralSymmetryB.X(), 2 * centralSymmetryO.Y() - centralSymmetryB.Y()]);
+        centralSymmetryC1.setPosition(JXG.COORDS_BY_USER, [2 * centralSymmetryO.X() - centralSymmetryC.X(), 2 * centralSymmetryO.Y() - centralSymmetryC.Y()]);
+        centralSymmetryA1B1C1.vertices = [centralSymmetryA1, centralSymmetryB1, centralSymmetryC1];
+        boardCentralSymmetry.update();
+    }
+
+    // Axial Symmetry Graph
+    const boardAxialSymmetry = JXG.JSXGraph.initBoard('jxgbox-axial-symmetry', {
+        boundingbox: [-10, 5, 10, -5],
+        axis: true,
+        keepaspectratio: true,
+        origin: [0, 0],
+        ticks: {
+            majorHeight: 1,
+            majorWidth: 1,
+            drawLabels: true
+        },
+        drag: true,
+        zoomX: 1.25,
+        zoomY: 1.25,
+        showCopyright: false,
+    });
+
+    let axialSymmetryA = boardAxialSymmetry.create('point', [-3, -2], {name: 'A', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let axialSymmetryB = boardAxialSymmetry.create('point', [-1, 1], {name: 'B', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let axialSymmetryC = boardAxialSymmetry.create('point', [-4, 3], {name: 'C', color: 'red', strokeColor: 'red', strokeOpacity: 1});
+    let axialSymmetryABC = boardAxialSymmetry.create('polygon', [axialSymmetryA, axialSymmetryB, axialSymmetryC], {fillOpacity: 0, strokeOpacity: 1, strokeColor: 'red'});
+
+    let axialSymmetryO1 = boardAxialSymmetry.create('point', [0, 0], {name: 'O1', fillColor: 'black', strokeColor: 'black'})
+    let axialSymmetryO2 = boardAxialSymmetry.create('point', [1, 1], {name: 'O2', fillColor: 'black', strokeColor: 'black'})
+    let axialSymmetryO1O2 = boardAxialSymmetry.create('line', [axialSymmetryO1, axialSymmetryO2], {fillColor: 'black', strokeColor: 'black', dash: 2})
+
+    let axialSymmetryA1 = boardAxialSymmetry.create('reflection', [axialSymmetryA, axialSymmetryO1O2], {strokeColor: 'blue', fillColor: 'blue', name: 'A1'});
+    let axialSymmetryB1 = boardAxialSymmetry.create('reflection', [axialSymmetryB, axialSymmetryO1O2], {strokeColor: 'blue', fillColor: 'blue', name: 'B1'});
+    let axialSymmetryC1 = boardAxialSymmetry.create('reflection', [axialSymmetryC, axialSymmetryO1O2], {strokeColor: 'blue', fillColor: 'blue', name: 'C1'});
+    let axialSymmetryA2B2C2 = boardAxialSymmetry.create('polygon', [axialSymmetryA1, axialSymmetryB1, axialSymmetryC1], {fillOpacity: 0})
+
+    let showPunctureLinesAxialCheckbox = document.getElementById('show-puncture-lines-axial');
+    showPunctureLinesAxialCheckbox.addEventListener('change', updateAxialSymmetryGraph);
+
+    boardAxialSymmetry.on('update', updateAxialSymmetryGraph);
+
+    let axialLine1 = boardAxialSymmetry.create('segment', [axialSymmetryA, axialSymmetryA1], {color: 'green', dash: 2})
+    let axialLine2 = boardAxialSymmetry.create('segment', [axialSymmetryB, axialSymmetryB1], {color: 'green', dash: 2})
+    let axialLine3 = boardAxialSymmetry.create('segment', [axialSymmetryC, axialSymmetryC1], {color: 'green', dash: 2})
+
+    function updateAxialSymmetryGraph() {
+        axialLine1.setAttribute({visible: showPunctureLinesAxialCheckbox.checked})
+        axialLine2.setAttribute({visible: showPunctureLinesAxialCheckbox.checked})
+        axialLine3.setAttribute({visible: showPunctureLinesAxialCheckbox.checked})
+        boardAxialSymmetry.update();
+    }
+
+    const transferBoard = JXG.JSXGraph.initBoard('jxgbox-parallel-transfer', {
+        boundingbox: [-10, 5, 10, -5],
+        axis: true,
+        keepaspectratio: true,
+        origin: [0, 0],
+        ticks: {
+            majorHeight: 1,
+            majorWidth: 1,
+            drawLabels: true
+        },
+        drag: true,
+        zoomX: 1.25,
+        zoomY: 1.25,
+        showCopyright: false,
+    });
+    transferBoard.on('update', updateTransferGraph);
+
+    xOffsetSlider.addEventListener('input', updateTransferGraph);
+
+    yOffsetSlider.addEventListener('input', updateTransferGraph);
+
+    let showPunctureLinesTransferCheckbox = document.getElementById('show-puncture-lines-transfer');
+    showPunctureLinesTransferCheckbox.addEventListener('change', updateTransferGraph);
+
+    const transferA = transferBoard.create('point', [-1, -1], {name: "A"});
+    const transferB = transferBoard.create('point', [1, 2], {name: "B"});
+    const transferC = transferBoard.create('point', [2, 1], {name: "C"});
+    const transferABC = transferBoard.create('polygon', [transferA, transferB, transferC], {fillOpacity: 0, });
+
+    const transferA1 = transferBoard.create('point', [transferA.X(), transferA.Y()], {name: 'A1', strokeColor: 'blue', fillColor: 'blue', fixed: true});
+    const transferB1 = transferBoard.create('point', [transferB.X(), transferB.Y()], {name: 'B1', strokeColor: 'blue', fillColor: 'blue', fixed: true});
+    const transferC1 = transferBoard.create('point', [transferC.X(), transferC.Y()], {name: 'C1', strokeColor: 'blue', fillColor: 'blue', fixed: true});
+    const transferA1B1C1 = transferBoard.create('polygon', [transferA1, transferB1, transferC1], {fillOpacity: 0})
+
+    const transferLine1 = transferBoard.create('segment', [transferA, transferA1], {strokeColor: 'green', dash: 2});
+    const transferLine2 = transferBoard.create('segment', [transferB, transferB1], {strokeColor: 'green', dash: 2});
+    const transferLine3 = transferBoard.create('segment', [transferC, transferC1], {strokeColor: 'green', dash: 2});
+    function updateTransferGraph(){
+        let xOffset = parseFloat(xOffsetSlider.value);
+        let yOffset = parseFloat(yOffsetSlider.value);
+        xOffsetValue.textValue = xOffsetSlider.value;
+        yOffsetValue.textValue = yOffsetSlider.value;
+
+        transferA1.moveTo([transferA.X() + xOffset, transferA.Y() + yOffset]);
+        transferB1.moveTo([transferB.X() + xOffset, transferB.Y() + yOffset]);
+        transferC1.moveTo([transferC.X() + xOffset, transferC.Y() + yOffset]);
+
+        transferLine1.setAttribute({visible: showPunctureLinesTransferCheckbox.checked});
+        transferLine2.setAttribute({visible: showPunctureLinesTransferCheckbox.checked});
+        transferLine3.setAttribute({visible: showPunctureLinesTransferCheckbox.checked});
+
+        transferBoard.update();
+    }
+
+    const rotationBoard = JXG.JSXGraph.initBoard('jxgbox-rotation', {
+        boundingbox: [-10, 5, 10, -5],
+        axis: true,
+        keepaspectratio: true,
+        origin: [0, 0],
+        ticks: {
+            majorHeight: 1,
+            majorWidth: 1,
+            drawLabels: true
+        },
+        drag: true,
+        zoomX: 1.25,
+        zoomY: 1.25,
+        showCopyright: false,
+    });
+
+    let degree = 0;
+
+
+    function toRadians(angle) {
+        return angle * (Math.PI / 180);
+    }
+
+    document.getElementById('rotation').addEventListener('input', updateRotationGraph);
+
+    let showPunctureLinesRotateCheckbox = document.getElementById('show-puncture-lines-rotate');
+    showPunctureLinesRotateCheckbox.addEventListener('change', updateRotationGraph);
+
+    const rotationA = rotationBoard.create('point', [1, 0], {name: "A", fillColor: 'red'});
+    const rotationB = rotationBoard.create('point', [2, -1], {name: "B", fillColor: 'red'});
+    const rotationC = rotationBoard.create('point', [2, 1], {name: "C", fillColor: 'red'});
+    const rotationABC = rotationBoard.create('polygon', [rotationA, rotationB, rotationC], {fillOpacity: 0});
+
+    const rotationO = rotationBoard.create('point', [0, 0], {name: 'O', fillColor: 'black', strokeColor: 'black'});
+
+    let rotationTA = rotationBoard.create('transform', [function () { return toRadians(degree); }, rotationO], {type: 'rotate'});
+    let rotationTB = rotationBoard.create('transform', [function () { return toRadians(degree); }, rotationO], {type: 'rotate'});
+    let rotationTC = rotationBoard.create('transform', [function () { return toRadians(degree); }, rotationO], {type: 'rotate'});
+
+    let rotationA1 = rotationBoard.create('point', [rotationA, [rotationTA]], {name: "A1", fillColor: 'blue', strokeColor: 'blue', fixed: true});
+    let rotationB1 = rotationBoard.create('point', [rotationB, [rotationTB]], {name: "B1", fillColor: 'blue', strokeColor: 'blue', fixed: true});
+    let rotationC1 = rotationBoard.create('point', [rotationC, [rotationTC]], {name: "C1", fillColor: 'blue', strokeColor: 'blue', fixed: true});
+
+    const rotationA1B1C1 = rotationBoard.create('polygon', [rotationA1, rotationB1, rotationC1], {fillOpacity: 0});
+
+    const rotationLine1 = rotationBoard.create('segment', [rotationA, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine2 = rotationBoard.create('segment', [rotationA1, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine3 = rotationBoard.create('segment', [rotationB, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine4 = rotationBoard.create('segment', [rotationB1, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine5 = rotationBoard.create('segment', [rotationC, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine6 = rotationBoard.create('segment', [rotationC1, rotationO], {strokeColor: 'green', dash: 2});
+
+    function updateRotationGraph() {
+        rotationLine1.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+        rotationLine2.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+
+        rotationLine3.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+        rotationLine4.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+        rotationLine5.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+        rotationLine6.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
+
+        degree = parseFloat(rotationSlider.value);
+        rotationValue.textContent = this.value.toString() + '°';
+
+        rotationBoard.update();
+    }
+</script>
+</body>
+</html>
