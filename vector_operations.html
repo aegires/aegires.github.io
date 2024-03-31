@@ -158,9 +158,9 @@
     const v1y = Math.sin((angle + 30) * Math.PI / 180) * scale;
     const v2x = Math.cos((30) * Math.PI / 180) * scale;
     const v2y = Math.sin((30) * Math.PI / 180) * scale;
-    v1Addition = boardAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'blue'});
-    v2Addition = boardAddition.create('arrow', [[0, 0], [v2x, v2y]], {strokeColor: 'red'});
-    sumVector = boardAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green'});
+    v1Addition = boardAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'blue', fixed: true});
+    v2Addition = boardAddition.create('arrow', [[0, 0], [v2x, v2y]], {strokeColor: 'red', fixed: true});
+    sumVector = boardAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green', fixed: true});
     if (showPunctureLinesCheckbox.checked) {
       punctureLine1 = boardAddition.create('line', [[v1x, v1y], [v1x + v2x, v1y + v2y]], {strokeColor: 'gray', dash: 2});
       punctureLine2 = boardAddition.create('line', [[v2x, v2y], [v1x + v2x, v1y + v2y]], {strokeColor: 'gray', dash: 2});
@@ -230,9 +230,9 @@
     const v2x = Math.cos((angle2) * Math.PI / 180) * length2;
     const v2y = Math.sin((angle2) * Math.PI / 180) * length2;
 
-    v1Triangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'red'});
-    v2Triangle = boardTriangleAddition.create('arrow', [[v1x, v1y], [v1x + v2x, v1y + v2y]], {strokeColor: 'blue'});
-    sumVectorTriangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green'});
+    v1Triangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x, v1y]], {strokeColor: 'red', fixed: true});
+    v2Triangle = boardTriangleAddition.create('arrow', [[v1x, v1y], [v1x + v2x, v1y + v2y]], {strokeColor: 'blue', fixed: true});
+    sumVectorTriangle = boardTriangleAddition.create('arrow', [[0, 0], [v1x + v2x, v1y + v2y]], {strokeColor: 'green', fixed: true});
 
     boardTriangleAddition.update();
   }
@@ -266,7 +266,7 @@
     angleRotationValue.textContent = angle.toFixed(0) + '°';
     const vx = Math.cos((angle) * Math.PI / 180);
     const vy = Math.sin((angle) * Math.PI / 180);
-    vRotation = boardRotation.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'blue'});
+    vRotation = boardRotation.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'blue', fixed: true});
     boardRotation.update();
   }
 
@@ -323,19 +323,19 @@
     lengthValue.textContent = length.toFixed(1);
     angleLengthValue.textContent = angle.toFixed(0) + '°';
 
-    segX = boardLength.create('segment', [[0, 0], [vx, 0]], {strokeColor: 'red'});
-    segY = boardLength.create('segment', [[vx, 0], [vx, vy]], {strokeColor: 'blue'});
+    segX = boardLength.create('segment', [[0, 0], [vx, 0]], {strokeColor: 'red', fixed: true});
+    segY = boardLength.create('segment', [[vx, 0], [vx, vy]], {strokeColor: 'blue', fixed: true});
 
     const lengthX = Math.abs(vx);
     const lengthY = Math.abs(vy);
 
     const vectorLength = Math.sqrt(lengthX * lengthX + lengthY * lengthY);
 
-    vLength = boardLength.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'green'});
+    vLength = boardLength.create('arrow', [[0, 0], [vx, vy]], {strokeColor: 'green', fixed: true});
 
     const formula = `\\(\\sqrt{(${lengthX.toFixed(1)})&sup2; + (${lengthY.toFixed(1)})&sup2;} = ${vectorLength.toFixed(1)}\\)`;
 
-    formulaText = boardLength.create('text', [-8, 3.5, ''], {fontSize: 18, strokeColor: 'black'});
+    formulaText = boardLength.create('text', [-8, 3.5, ''], {fontSize: 18, strokeColor: 'black', fixed: true});
 
     formulaText.rendNode.innerHTML = formula;
 
