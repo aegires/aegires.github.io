@@ -6,7 +6,6 @@
     <title>Движение(Геометрия)</title>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/1.2.1/jsxgraphcore.js"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <style>
         #jxgbox-central-symmetry,
         #jxgbox-axial-symmetry,
@@ -36,6 +35,7 @@
     </style>
 </head>
 <body>
+<a href="index.html">Назад</a>
 <h1>Движение(геометрия)</h1>
 <p>Движение - это отображение плоскости самой на себя с сохранением расстояний между её точками.</p>
 <p>На этой странице вы можете исследовать разные частные случаи движения.</p>
@@ -332,12 +332,12 @@
 
     const rotationA1B1C1 = rotationBoard.create('polygon', [rotationA1, rotationB1, rotationC1], {fillOpacity: 0});
 
-    const rotationLine1 = rotationBoard.create('segment', [rotationA, rotationO], {strokeColor: 'green', dash: 2});
-    const rotationLine2 = rotationBoard.create('segment', [rotationA1, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine1 = rotationBoard.create('segment', [rotationA, rotationO], {strokeColor: 'yellow', dash: 2});
+    const rotationLine2 = rotationBoard.create('segment', [rotationA1, rotationO], {strokeColor: 'yellow', dash: 2});
     const rotationLine3 = rotationBoard.create('segment', [rotationB, rotationO], {strokeColor: 'green', dash: 2});
     const rotationLine4 = rotationBoard.create('segment', [rotationB1, rotationO], {strokeColor: 'green', dash: 2});
-    const rotationLine5 = rotationBoard.create('segment', [rotationC, rotationO], {strokeColor: 'green', dash: 2});
-    const rotationLine6 = rotationBoard.create('segment', [rotationC1, rotationO], {strokeColor: 'green', dash: 2});
+    const rotationLine5 = rotationBoard.create('segment', [rotationC, rotationO], {strokeColor: 'purple', dash: 2});
+    const rotationLine6 = rotationBoard.create('segment', [rotationC1, rotationO], {strokeColor: 'purple', dash: 2});
 
     function updateRotationGraph() {
         rotationLine1.setAttribute({visible: showPunctureLinesRotateCheckbox.checked});
